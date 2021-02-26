@@ -1,4 +1,4 @@
-# kontent-environments-comparer-vue-v2
+# kontent-environments-comparer
 
 ![demo](./demo.gif)
 
