@@ -1,5 +1,7 @@
 # kontent-environments-comparer-vue-v2
 
+![demo](./demo.gif)
+
 ## Project setup
 ```
 yarn install
