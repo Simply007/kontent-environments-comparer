@@ -4,8 +4,14 @@ import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
+import VueAnalytics from "vue-analytics";
 
 Vue.config.productionTip = false;
+
+Vue.use(VueAnalytics, {
+  id: "UA-173472499-1",
+  router
+});
 
 new Vue({
   router,
