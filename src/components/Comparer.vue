@@ -1,6 +1,16 @@
 <template>
   <div class="comparer">
     <v-container>
+      <v-banner v-if="message">
+        <v-icon slot="icon" color="warning" size="36">
+          mdi-alert-circle-outline
+        </v-icon>
+        {{ message }}
+
+        <template v-slot:actions>
+          <v-btn color="primary" text v-on:click="closeBanner"> Close </v-btn>
+        </template>
+      </v-banner>
       <v-row align="center" justify="center" align-items="center">
         <v-col cols="12" md="5">
           <v-text-field
@@ -14,7 +24,7 @@
           >
           </v-text-field>
         </v-col>
-        <v-col cols="12" md="2" style="text-align: center;">
+        <v-col cols="12" md="2" style="text-align: center">
           <v-btn @click="compare">Compare</v-btn>
         </v-col>
         <v-col cols="12" md="5">
@@ -30,28 +40,29 @@
           </v-text-field>
         </v-col>
       </v-row>
+      <v-progress-linear indeterminate v-if="loading" />
     </v-container>
-    <v-tabs centered>
+    <v-tabs centered v-if="displayTabs">
       <v-tabs-slider></v-tabs-slider>
-      <v-tab> Content types </v-tab>
-      <v-tab-item>
+      <v-tab v-if="displayTypesTab"> Content types </v-tab>
+      <v-tab-item v-if="displayTypesTab">
         <Diff
           :sourceObjects="sourceTypes"
           :targetObjects="targetTypes"
           objectIdentificationCodename="codename"
         />
       </v-tab-item>
-      <v-tab> Content type snippets </v-tab>
-      <v-tab-item>
+      <v-tab v-if="displaySnippetsTab"> Content type snippets </v-tab>
+      <v-tab-item v-if="displaySnippetsTab">
         <Diff
           :sourceObjects="sourceSnippets"
           :targetObjects="targetSnippets"
           objectIdentificationCodename="codename"
         />
       </v-tab-item>
-      <v-tab> Content taxonomies </v-tab>
-      <v-tab-item
-        ><Diff
+      <v-tab v-if="displayTaxonomiesTab"> Content taxonomies </v-tab>
+      <v-tab-item v-if="displayTaxonomiesTab">
+        <Diff
           :sourceObjects="sourceTaxonomies"
           :targetObjects="targetTaxonomies"
           objectIdentificationCodename="codename"
@@ -83,53 +94,115 @@ export default {
       sourceSnippets: [],
       targetSnippets: [],
       sourceTaxonomies: [],
-      targetTaxonomies: []
+      targetTaxonomies: [],
+      loading: false,
+      message: ""
     };
   },
+  computed: {
+    displayTabs: function() {
+      return (
+        (this.displayTypesTab ||
+          this.displaySnippetsTab ||
+          this.displayTaxonomiesTab) &&
+        this.loading === false
+      );
+    },
+    displayTypesTab: function() {
+      return this.sourceTypes.length > 0 || this.targetTypes.length > 0;
+    },
+    displaySnippetsTab: function() {
+      return this.sourceSnippets.length > 0 || this.targetSnippets.length > 0;
+    },
+    displayTaxonomiesTab: function() {
+      return (
+        this.sourceTaxonomies.length > 0 || this.targetTaxonomies.length > 0
+      );
+    }
+  },
   methods: {
+    closeBanner() {
+      this.message = "";
+    },
+    showMessage(message) {
+      this.message = message;
+    },
     async compare() {
-      const sourcePayload = jwtDecode(this.sourceEnvironmentManagementId);
-      const targetPaload = jwtDecode(this.targetEnvironmentManagementId);
+      this.loading = true;
 
-      const sourceClient = new ManagementClient({
-        projectId: getDashedGuid(sourcePayload.project_id), // id of your Kentico Kontent project
-        apiKey: this.sourceEnvironmentManagementId // Content management API token
-      });
+      let sourceProjectId = "";
+      let targetProjectId = "";
 
-      const targetClient = new ManagementClient({
-        projectId: getDashedGuid(targetPaload.project_id), // id of your Kentico Kontent project
-        apiKey: this.targetEnvironmentManagementId // Content management API token
-      });
+      try {
+        const sourcePayload = jwtDecode(this.sourceEnvironmentManagementId);
+        sourceProjectId = getDashedGuid(sourcePayload.project_id);
+      } catch (error) {
+        this.message =
+          "Error parsing source Management API key. Check console for detailed error.";
+        this.loading = false;
+        console.error(error.message);
+        throw error;
+      }
 
-      this.sourceTypes = await sourceClient
-        .listContentTypes()
-        .toPromise()
-        .then(result => result.rawData.types);
+      try {
+        const targetPaload = jwtDecode(this.targetEnvironmentManagementId);
+        targetProjectId = getDashedGuid(targetPaload.project_id);
+      } catch (error) {
+        this.message =
+          "Error parsing target Management API key. Check console for detailed error.";
+        this.loading = false;
+        console.error(error.message);
+        throw error;
+      }
 
-      this.targetTypes = await targetClient
-        .listContentTypes()
-        .toPromise()
-        .then(result => result.rawData.types);
+      try {
+        const sourceClient = new ManagementClient({
+          projectId: sourceProjectId, // id of your Kentico Kontent project
+          apiKey: this.sourceEnvironmentManagementId // Content management API token
+        });
 
-      this.sourceSnippets = await sourceClient
-        .listContentTypeSnippets()
-        .toPromise()
-        .then(result => result.rawData.snippets);
+        const targetClient = new ManagementClient({
+          projectId: targetProjectId, // id of your Kentico Kontent project
+          apiKey: this.targetEnvironmentManagementId // Content management API token
+        });
 
-      this.targetSnippets = await targetClient
-        .listContentTypeSnippets()
-        .toPromise()
-        .then(result => result.rawData.snippets);
+        this.sourceTypes = await sourceClient
+          .listContentTypes()
+          .toPromise()
+          .then(result => result.rawData.types);
 
-      this.sourceTaxonomies = await sourceClient
-        .listTaxonomies()
-        .toPromise()
-        .then(result => result.rawData.taxonomies);
+        this.targetTypes = await targetClient
+          .listContentTypes()
+          .toPromise()
+          .then(result => result.rawData.types);
 
-      this.targetTaxonomies = await targetClient
-        .listTaxonomies()
-        .toPromise()
-        .then(result => result.rawData.taxonomies);
+        this.sourceSnippets = await sourceClient
+          .listContentTypeSnippets()
+          .toPromise()
+          .then(result => result.rawData.snippets);
+
+        this.targetSnippets = await targetClient
+          .listContentTypeSnippets()
+          .toPromise()
+          .then(result => result.rawData.snippets);
+
+        this.sourceTaxonomies = await sourceClient
+          .listTaxonomies()
+          .toPromise()
+          .then(result => result.rawData.taxonomies);
+
+        this.targetTaxonomies = await targetClient
+          .listTaxonomies()
+          .toPromise()
+          .then(result => result.rawData.taxonomies);
+        this.loading = false;
+      } catch (error) {
+        this.message =
+          "Error in loading data. Check console for detailed error.";
+        this.loading = false;
+        console.error(error.message);
+        throw error;
+      }
     }
   }
 };
