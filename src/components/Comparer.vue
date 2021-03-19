@@ -1,42 +1,36 @@
 <template>
   <div class="comparer">
-    <v-row align="center" justify="center">
-      <v-col cols="5">
-        <v-row align-content="center" align="center">
-          <v-col cols="12" sm="12">
-            <v-text-field
-              filled
-              clearable
-              label="Source management API Key"
-              v-model="sourceEnvironmentManagementId"
-              :append-icon="showSourceManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="showSourceManagementKey ? 'text' : 'password'"
-              @click:append="showSourceManagementKey = !showSourceManagementKey"
-            >
-            </v-text-field>
-          </v-col>
-        </v-row>
-      </v-col>
-      <v-col cols="2">
-        <v-btn @click="compare">Compare</v-btn>
-      </v-col>
-      <v-col cols="5">
-        <v-row align-content="center" align="center">
-          <v-col cols="12" sm="12">
-            <v-text-field
-              filled
-              clearable
-              label="Target management API Key"
-              v-model="targetEnvironmentManagementId"
-              :append-icon="showTargetManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="showTargetManagementKey ? 'text' : 'password'"
-              @click:append="showTargetManagementKey = !showTargetManagementKey"
-            >
-            </v-text-field>
-          </v-col>
-        </v-row>
-      </v-col>
-    </v-row>
+    <v-container>
+      <v-row align="center" justify="center" align-items="center">
+        <v-col cols="12" md="5">
+          <v-text-field
+            filled
+            clearable
+            label="Source management API Key"
+            v-model="sourceEnvironmentManagementId"
+            :append-icon="showSourceManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="showSourceManagementKey ? 'text' : 'password'"
+            @click:append="showSourceManagementKey = !showSourceManagementKey"
+          >
+          </v-text-field>
+        </v-col>
+        <v-col cols="12" md="2" style="text-align: center;">
+          <v-btn @click="compare">Compare</v-btn>
+        </v-col>
+        <v-col cols="12" md="5">
+          <v-text-field
+            filled
+            clearable
+            label="Target management API Key"
+            v-model="targetEnvironmentManagementId"
+            :append-icon="showTargetManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="showTargetManagementKey ? 'text' : 'password'"
+            @click:append="showTargetManagementKey = !showTargetManagementKey"
+          >
+          </v-text-field>
+        </v-col>
+      </v-row>
+    </v-container>
     <v-tabs centered>
       <v-tabs-slider></v-tabs-slider>
       <v-tab> Content types </v-tab>
