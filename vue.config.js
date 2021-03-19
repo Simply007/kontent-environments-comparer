@@ -1,4 +1,5 @@
 module.exports = {
   transpileDependencies: ["vuetify"],
-  publicPath: "/kontent-environments-comparer/"
+  publicPath:
+    process.env.NETLIFY === "true" ? "/" : "/kontent-environments-comparer/"
 };
