@@ -7,16 +7,6 @@
             <v-text-field
               filled
               clearable
-              label="Source environment ID"
-              v-model="sourceEnvironmentDeliveryId"
-              :append-icon="showSourceDeliveryId ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="showSourceDeliveryId ? 'text' : 'password'"
-              @click:append="showSourceDeliveryId = !showSourceDeliveryId"
-            >
-            </v-text-field>
-            <v-text-field
-              filled
-              clearable
               label="Source management API Key"
               v-model="sourceEnvironmentManagementId"
               :append-icon="showSourceManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
@@ -33,16 +23,6 @@
       <v-col cols="5">
         <v-row align-content="center" align="center">
           <v-col cols="12" sm="12">
-            <v-text-field
-              filled
-              clearable
-              label="Target environment ID"
-              v-model="targetEnvironmentDeliveryId"
-              :append-icon="showTargetDeliveryId ? 'mdi-eye' : 'mdi-eye-off'"
-              :type="showTargetDeliveryId ? 'text' : 'password'"
-              @click:append="showTargetDeliveryId = !showTargetDeliveryId"
-            >
-            </v-text-field>
             <v-text-field
               filled
               clearable
@@ -90,6 +70,8 @@
 <script>
 import { ManagementClient } from "@kentico/kontent-management";
 import Diff from "./Diff.vue";
+import { getDashedGuid } from "../utils/guid";
+import jwtDecode from "jwt-decode";
 
 export default {
   name: "Comparer",
@@ -98,13 +80,9 @@ export default {
   },
   data() {
     return {
-      showSourceDeliveryId: false,
       showSourceManagementKey: false,
-      showTargetDeliveryId: false,
       showTargetManagementKey: false,
-      sourceEnvironmentDeliveryId: "",
       sourceEnvironmentManagementId: "",
-      targetEnvironmentDeliveryId: "",
       targetEnvironmentManagementId: "",
       sourceTypes: [],
       targetTypes: [],
@@ -116,13 +94,16 @@ export default {
   },
   methods: {
     async compare() {
+      const sourcePayload = jwtDecode(this.sourceEnvironmentManagementId);
+      const targetPaload = jwtDecode(this.targetEnvironmentManagementId);
+
       const sourceClient = new ManagementClient({
-        projectId: this.sourceEnvironmentDeliveryId, // id of your Kentico Kontent project
+        projectId: getDashedGuid(sourcePayload.project_id), // id of your Kentico Kontent project
         apiKey: this.sourceEnvironmentManagementId // Content management API token
       });
 
       const targetClient = new ManagementClient({
-        projectId: this.targetEnvironmentDeliveryId, // id of your Kentico Kontent project
+        projectId: getDashedGuid(targetPaload.project_id), // id of your Kentico Kontent project
         apiKey: this.targetEnvironmentManagementId // Content management API token
       });
 
@@ -160,21 +141,4 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.inputs {
-  display: flex;
-  margin: 1em;
-  padding: 1em;
-  justify-content: center;
-}
-
-.inputs > * {
-  margin: 1em;
-}
-
-.input-column {
-  display: flex;
-  flex-flow: column;
-}
-</style>
+<style scoped></style>
