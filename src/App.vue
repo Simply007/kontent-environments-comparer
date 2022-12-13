@@ -12,8 +12,8 @@
         />
       </div>
       <v-toolbar-title
-        >Kontent<span style="color:#3dcca8">.</span>ai Environments
-        Comparer</v-toolbar-title
+        >Kontent<span style="color: #3dcca8">.</span>ai Environments Comparer
+        (v{{ version }})</v-toolbar-title
       >
 
       <v-spacer></v-spacer>
@@ -37,6 +37,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Home from "./views/Home.vue";
+import { version } from "../package.json";
 
 export default Vue.extend({
   name: "App",
@@ -46,7 +47,7 @@ export default Vue.extend({
   },
 
   data: () => ({
-    //
+    version
   })
 });
 </script>
