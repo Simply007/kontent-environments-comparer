@@ -28,12 +28,14 @@ export default {
             target =>
               target[this.objectIdentificationCodename] ===
               sourceType[this.objectIdentificationCodename]
-          ) || {};
+          ) || undefined;
         const diffInput = createTwoFilesPatch(
           sourceType[this.objectIdentificationCodename],
           sourceType[this.objectIdentificationCodename], // maybe change as a filename
           JSON.stringify(sourceType, undefined, 2),
-          JSON.stringify(targetTypeCandidate, undefined, 2)
+          targetTypeCandidate
+            ? JSON.stringify(targetTypeCandidate, undefined, 2)
+            : ""
         );
         json.push(...parse(diffInput));
       });
@@ -51,12 +53,11 @@ export default {
         const diffInput = createTwoFilesPatch(
           extraTargetType[this.objectIdentificationCodename],
           extraTargetType[this.objectIdentificationCodename], // maybe change as a filename
-          JSON.stringify({}, undefined, 2),
+          "",
           JSON.stringify(extraTargetType, undefined, 2)
         );
         json.push(...parse(diffInput));
       });
-
       const htmlDiffOutput = html(json, {
         drawFileList: true,
         matching: "lines",
