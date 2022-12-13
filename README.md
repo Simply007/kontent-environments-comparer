@@ -1,4 +1,4 @@
-# kontent-environments-comparer
+# Kontent.ai environments comparer
 
 ![demo](./demo.gif)
 

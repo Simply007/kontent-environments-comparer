@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="secondary" dark>
       <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
@@ -11,7 +11,10 @@
           width="40"
         />
       </div>
-      <v-toolbar-title>Kontent Environments Comparer</v-toolbar-title>
+      <v-toolbar-title
+        >Kontent<span style="color:#3dcca8">.</span>ai Environments
+        Comparer</v-toolbar-title
+      >
 
       <v-spacer></v-spacer>
 
