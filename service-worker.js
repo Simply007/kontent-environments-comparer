@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/kontent-environments-comparer/precache-manifest.7661dd75ab9579305f93348d234eac8f.js"
+  "/kontent-environments-comparer/precache-manifest.9a70866d109ee48c068c03c64f4dbfea.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "kontent-environments-comparer"});
