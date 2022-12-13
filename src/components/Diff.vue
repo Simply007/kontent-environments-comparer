@@ -58,11 +58,15 @@ export default {
         );
         json.push(...parse(diffInput));
       });
-      const htmlDiffOutput = html(json, {
-        drawFileList: true,
-        matching: "lines",
-        outputFormat: "side-by-side"
-      });
+
+      const htmlDiffOutput = html(
+        json.sort((a, b) => (a.oldName > b.oldName ? 1 : -1)),
+        {
+          drawFileList: true,
+          matching: "lines",
+          outputFormat: "side-by-side"
+        }
+      );
       return htmlDiffOutput;
     }
   }
