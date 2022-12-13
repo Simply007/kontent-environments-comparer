@@ -168,24 +168,37 @@ export default {
 
         this.sourceTypes = await sourceClient
           .listContentTypes()
-          .toPromise()
-          .then(result => result.rawData.types);
+          .toAllPromise()
+          .then(result => {
+            return [
+              ...result.responses.flatMap(response => response.rawData.types)
+            ];
+          });
 
         this.targetTypes = await targetClient
           .listContentTypes()
-          .toPromise()
-          .then(result => result.rawData.types);
+          .toAllPromise()
+          .then(result => {
+            return [
+              ...result.responses.flatMap(response => response.rawData.types)
+            ];
+          });
 
         this.sourceSnippets = await sourceClient
           .listContentTypeSnippets()
-          .toPromise()
-          .then(result => result.rawData.snippets);
+          .toAllPromise()
+          .then(result => [
+            ...result.responses.flatMap(response => response.rawData.snippets)
+          ]);
 
         this.targetSnippets = await targetClient
           .listContentTypeSnippets()
-          .toPromise()
-          .then(result => result.rawData.snippets);
+          .toAllPromise()
+          .then(result => [
+            ...result.responses.flatMap(response => response.rawData.snippets)
+          ]);
 
+        // Taxonomies are not paginated
         this.sourceTaxonomies = await sourceClient
           .listTaxonomies()
           .toPromise()
@@ -195,6 +208,7 @@ export default {
           .listTaxonomies()
           .toPromise()
           .then(result => result.rawData.taxonomies);
+
         this.loading = false;
       } catch (error) {
         this.message =
