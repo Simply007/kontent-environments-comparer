@@ -13,31 +13,62 @@
       </v-banner>
       <v-row align="center" justify="center" align-items="center">
         <v-col cols="12" md="5">
-          <v-text-field
-            filled
-            clearable
-            label="Source management API Key"
-            v-model="sourceEnvironmentManagementId"
-            :append-icon="showSourceManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="showSourceManagementKey ? 'text' : 'password'"
-            @click:append="showSourceManagementKey = !showSourceManagementKey"
-          >
-          </v-text-field>
+          <v-box>
+            <v-text-field
+              filled
+              clearable
+              label="Source environment ID"
+              v-model="sourceEnvironmentId"
+              :append-icon="sourceEnvironmentIdKey ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="sourceEnvironmentIdKey ? 'text' : 'password'"
+              @click:append="sourceEnvironmentIdKey = !sourceEnvironmentIdKey"
+            >
+            </v-text-field>
+            <v-text-field
+              filled
+              clearable
+              label="Source management API Key"
+              v-model="sourceEnvironmentManagementId"
+              :append-icon="showSourceManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showSourceManagementKey ? 'text' : 'password'"
+              @click:append="showSourceManagementKey = !showSourceManagementKey"
+            >
+            </v-text-field>
+          </v-box>
         </v-col>
         <v-col cols="12" md="2" style="text-align: center">
-          <v-btn @click="compare">Compare</v-btn>
+          <v-box>
+            <v-list-item>
+              <v-checkbox style="margin: auto;" v-model="qa" :label="`QA`" />
+            </v-list-item>
+            <v-list-item>
+              <v-btn style="margin: auto;" @click="compare">Compare</v-btn>
+            </v-list-item>
+          </v-box>
         </v-col>
         <v-col cols="12" md="5">
-          <v-text-field
-            filled
-            clearable
-            label="Target management API Key"
-            v-model="targetEnvironmentManagementId"
-            :append-icon="showTargetManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="showTargetManagementKey ? 'text' : 'password'"
-            @click:append="showTargetManagementKey = !showTargetManagementKey"
-          >
-          </v-text-field>
+          <v-box>
+            <v-text-field
+              filled
+              clearable
+              label="Target environment ID"
+              v-model="targetEnvironmentId"
+              :append-icon="targetEnvironmentIdKey ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="targetEnvironmentIdKey ? 'text' : 'password'"
+              @click:append="targetEnvironmentIdKey = !targetEnvironmentIdKey"
+            >
+            </v-text-field>
+            <v-text-field
+              filled
+              clearable
+              label="Target management API Key"
+              v-model="targetEnvironmentManagementId"
+              :append-icon="showTargetManagementKey ? 'mdi-eye' : 'mdi-eye-off'"
+              :type="showTargetManagementKey ? 'text' : 'password'"
+              @click:append="showTargetManagementKey = !showTargetManagementKey"
+            >
+            </v-text-field>
+          </v-box>
         </v-col>
       </v-row>
       <v-progress-linear indeterminate v-if="loading" />
@@ -87,8 +118,12 @@ export default {
     return {
       showSourceManagementKey: false,
       showTargetManagementKey: false,
+      sourceEnvironmentIdKey: false,
+      targetEnvironmentIdKey: false,
       sourceEnvironmentManagementId: "",
       targetEnvironmentManagementId: "",
+      sourceEnvironmentId: "",
+      targetEnvironmentId: "",
       sourceTypes: [],
       targetTypes: [],
       sourceSnippets: [],
@@ -96,7 +131,8 @@ export default {
       sourceTaxonomies: [],
       targetTaxonomies: [],
       loading: false,
-      message: ""
+      message: "",
+      qa: false
     };
   },
   computed: {
@@ -130,40 +166,21 @@ export default {
     async compare() {
       this.loading = true;
 
-      let sourceProjectId = "";
-      let targetProjectId = "";
-
-      try {
-        const sourcePayload = jwtDecode(this.sourceEnvironmentManagementId);
-        sourceProjectId = getDashedGuid(sourcePayload.project_id);
-      } catch (error) {
-        this.message =
-          "Error parsing source Management API key. Check console for detailed error.";
-        this.loading = false;
-        console.error(error.message);
-        throw error;
-      }
-
-      try {
-        const targetPaload = jwtDecode(this.targetEnvironmentManagementId);
-        targetProjectId = getDashedGuid(targetPaload.project_id);
-      } catch (error) {
-        this.message =
-          "Error parsing target Management API key. Check console for detailed error.";
-        this.loading = false;
-        console.error(error.message);
-        throw error;
-      }
-
       try {
         const sourceClient = new ManagementClient({
-          projectId: sourceProjectId, // id of your Kentico Kontent project
-          apiKey: this.sourceEnvironmentManagementId // Content management API token
+          projectId: this.sourceEnvironmentId, // id of your Kentico Kontent project
+          apiKey: this.sourceEnvironmentManagementId, // Content management API token
+          baseUrl: this.qa
+            ? "https://manage.devkontentmasters.com/v2/projects"
+            : undefined
         });
 
         const targetClient = new ManagementClient({
-          projectId: targetProjectId, // id of your Kentico Kontent project
-          apiKey: this.targetEnvironmentManagementId // Content management API token
+          projectId: this.targetEnvironmentId, // id of your Kentico Kontent project
+          apiKey: this.targetEnvironmentManagementId, // Content management API token
+          baseUrl: this.qa
+            ? "https://manage.devkontentmasters.com/v2/projects"
+            : undefined
         });
 
         this.sourceTypes = await sourceClient
